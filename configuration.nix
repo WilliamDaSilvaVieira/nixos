@@ -354,7 +354,7 @@
       wlroots
 
       # Awesome 
-      (__getFlake "github:fortuneteller2k/nixpkgs-f2k").packages.${system}.awesome-git
+      (__getFlake "github:moni-dz/nixpkgs-f2k").packages.${system}.awesome-git
 
       
       ani-cli
@@ -524,6 +524,8 @@
 
   home-manager.users.william = { pkgs, ... }: {
     home.stateVersion = "23.11";
+
+    services.mpris-proxy.enable = true;
 
     gtk = {
       enable = true;
