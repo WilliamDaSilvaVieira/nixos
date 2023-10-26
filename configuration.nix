@@ -361,6 +361,7 @@
       mangal
       mangohud
       yuzu-mainline
+      ryujinx
       cemu
       rpcs3
     ];
