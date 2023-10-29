@@ -61,6 +61,7 @@
       noto-fonts-cjk-sans
       noto-fonts-cjk-serif
       google-fonts
+      terminus_font
     ];
   };
 
@@ -80,7 +81,7 @@
   };
 
   console = {
-    font = "Lat2-Terminus32";
+    font = "Terminus";
     keyMap = "br-abnt2";
     colors = [
       # Use terminal.sexy with alacritty
