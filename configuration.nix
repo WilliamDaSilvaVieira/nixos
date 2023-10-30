@@ -209,7 +209,6 @@
 
     # Steam
     steam-hardware.enable = true;
-
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -262,6 +261,7 @@
 
       #### Linux
       linuxHeaders
+      linux-firmware
 
       #### Party Tricks
       cmatrix
