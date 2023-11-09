@@ -62,6 +62,8 @@
       noto-fonts-cjk-serif
       google-fonts
       terminus_font
+      corefonts
+      vistafonts
     ];
   };
 
@@ -340,6 +342,7 @@
       eza
       kitty
       speedtest-cli
+      libreoffice
 
       # Hyprland
       wlr-randr
