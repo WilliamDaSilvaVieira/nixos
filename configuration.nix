@@ -192,6 +192,7 @@
       forceFullCompositionPipeline = true;
       nvidiaSettings = true;
       modesetting.enable = true;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
     };
 
     # Opengl
