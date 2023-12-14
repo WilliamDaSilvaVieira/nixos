@@ -14,12 +14,17 @@
   # Boot.
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
-    kernelParams = [ "nvidia_drm.modeset=1" ];
+    kernelParams = [ 
+      "nvidia_drm.modeset=1"
+      "amd_iommu=on"
+      "iommu=pt"
+    ];
     kernelModules = [
       "nvidia"
       "nvidia_modeset"
       "nvidia_uvm"
       "nvidia_drm"
+      "vfio-pci"
     ];
     blacklistedKernelModules = [ "kms" ];
     loader = {
@@ -43,10 +48,12 @@
       allowedTCPPorts = [
         42000 # Warpinator
         42001 # Warpinator
+        5900
       ];
       allowedUDPPorts = [
         42000 # Warpinator
         42001 # Warpinator
+        5900
       ];
     };
   };
@@ -150,7 +157,7 @@
         # Forbid root login through SSH.
         PermitRootLogin = "no";
         # Use keys only. Remove if you want to SSH using password (not recomended)
-        PasswordAuthentication = false;
+        PasswordAuthentication = true;
       };
     };
     picom = {
@@ -177,6 +184,7 @@
       displayManager.startx.enable = true;
       windowManager.awesome.enable = true;
     };
+    spice-vdagentd.enable = true;
   };
 
   # Hardware
@@ -231,9 +239,50 @@
   };
 
   # Virtualisation
-  virtualisation.libvirtd = {
-    enable = true;
-    qemu.ovmf.enable = true;
+  virtualisation = {
+    libvirtd = {
+      enable = true;
+      onBoot = "ignore";
+      onShutdown = "shutdown";
+      qemu = {
+        swtpm.enable = true;
+        ovmf.enable = true;
+        ovmf.packages = [ pkgs.OVMFFull.fd ];
+        runAsRoot = true;
+      };
+    };
+    spiceUSBRedirection.enable = true;
+  };
+  systemd.services.libvirtd = {
+    path = let
+            env = pkgs.buildEnv {
+              name = "qemu-hook-env";
+              paths = with pkgs; [
+                bash
+                libvirt
+                kmod
+                systemd
+                ripgrep
+                sd
+              ];
+            };
+          in
+          [ env ];
+
+    preStart = 
+    ''
+      mkdir -p /var/lib/libvirt/hooks
+      mkdir -p /var/lib/libvirt/hooks/qemu.d/win11/prepare/begin
+      mkdir -p /var/lib/libvirt/hooks/qemu.d/win11/release/end
+
+      ln -sf /etc/libvirt/hooks/qemu /var/lib/libvirt/hooks/qemu
+      ln -sf /etc/libvirt/hooks/qemu.d/win11/prepare/begin/start.sh /var/lib/libvirt/hooks/qemu.d/win11/prepare/begin/start.sh
+      ln -sf /etc/libvirt/hooks/qemu.d/win11/release/end/finish.sh /var/lib/libvirt/hooks/qemu.d/win11/release/end/finish.sh
+
+      chmod +x /var/lib/libvirt/hooks/qemu
+      chmod +x /var/lib/libvirt/hooks/qemu.d/win11/prepare/begin/start.sh
+      chmod +x /var/lib/libvirt/hooks/qemu.d/win11/release/end/finish.sh
+    '';
   };
 
   # List packages installed in system profile. To search, run:
@@ -294,7 +343,15 @@
       ffmpegthumbnailer
       mpv
       cinnamon.warpinator
+
+      #Virtualization
       virt-manager
+      virt-viewer
+      spice spice-gtk
+      spice-protocol
+      win-virtio
+      win-spice
+      gnome.adwaita-icon-theme
 
       #### Programing
         ### Languages
